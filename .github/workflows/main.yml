@@ -42,6 +42,14 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
+      - name: Cache docker images
+        uses: satackey/action-docker-layer-caching@v0.0.8
+        continue-on-error: true
+        with:
+          key: practera-app-v2-1-unit-test-docker-cache-{hash}
+          restore-keys: |
+            practera-app-v2-1-unit-test-docker-cache-
+
       - name: ECR login
         uses: aws-actions/amazon-ecr-login@v1
 
