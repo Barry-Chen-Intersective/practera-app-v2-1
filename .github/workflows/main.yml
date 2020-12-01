@@ -27,6 +27,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: practera-app-v2-1-cache-node-modules
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - name: ECR login
         uses: aws-actions/amazon-ecr-login@v1
 
