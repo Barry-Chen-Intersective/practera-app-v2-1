@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache node modules
+        id: cache-app-v2-modules
         uses: actions/cache@v2
         env:
           cache-name: practera-app-v2-1-cache-node-modules
@@ -43,15 +44,15 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install modules
-        if: steps.cache-primes.outputs.cache-hit != 'true'
+        if: steps.cache-app-v2-modules.outputs.cache-hit != 'true'
         run: |
           npm install
 
       - name: Unit tests
         run : |
           test -f src/environments/environment.ts && echo "environment here" || cp src/environments/environment.local.ts src/environments/environment.ts
-          ng build
-          ng test --karmaConfig=src/karma.conf.sonarci.js --no-watch
+          node_modules/.bin/ng build
+          node_modules/.bin/ng test --karmaConfig=src/karma.conf.sonarci.js --no-watch
 
       - name: List files
         if: ${{ always() }}
