@@ -42,25 +42,16 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Cache docker images
-        uses: satackey/action-docker-layer-caching@v0.0.8
-        continue-on-error: true
-        with:
-          key: practera-app-v2-1-unit-test-docker-cache-{hash}
-          restore-keys: |
-            practera-app-v2-1-unit-test-docker-cache-
-
-      - name: ECR login
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Docker pull
+      - name: Install modules
+        if: steps.cache-primes.outputs.cache-hit != 'true'
         run: |
-          docker pull ${{ env.AWS_USER_ID }}.dkr.ecr.ap-southeast-2.amazonaws.com/practera/app-v2-unit-test:HeadlessChrome-85
-          docker tag ${{ env.AWS_USER_ID }}.dkr.ecr.ap-southeast-2.amazonaws.com/practera/app-v2-unit-test:HeadlessChrome-85 practera/app-v2-unit-test:HeadlessChrome-85
-          test -f src/environments/environment.ts && echo "environment here" || cp src/environments/environment.local.ts src/environments/environment.ts
+          npm install
 
       - name: Unit tests
-        uses: ./.github/actions/unit-tests-build
+        run : |
+          test -f src/environments/environment.ts && echo "environment here" || cp src/environments/environment.local.ts src/environments/environment.ts
+          ng build
+          ng test --karmaConfig=src/karma.conf.sonarci.js --no-watch
 
       - name: List files
         if: ${{ always() }}
